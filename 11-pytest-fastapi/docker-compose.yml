@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: labs
+      POSTGRES_PASSWORD: labs
+      POSTGRES_DB: labs
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Durante la inicialización Postgres no escucha por TCP, así que el
+      # servicio recién queda sano cuando ya existe labs_test.
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "labs", "-d", "labs"]
+      interval: 2s
+      retries: 15
+
+  api:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8011:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://labs:labs@db:5432/labs
+    depends_on:
+      db:
+        condition: service_healthy
+
+  tests:
+    build: .
+    command: pytest
+    profiles: [tests]
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgresql+psycopg://labs:labs@db:5432/labs
+      TEST_DATABASE_URL: postgresql+psycopg://labs:labs@db:5432/labs_test
+      TEST_STRATEGY: ${TEST_STRATEGY:-rollback}
+    depends_on:
+      db:
+        condition: service_healthy

@@ -38,6 +38,22 @@ actualizar la tabla índice del `README.md` raíz.
   carpetas.
 - Documentación en español rioplatense, sin emojis en los títulos.
 
+## Ramas
+
+Se trabaja siempre desde `develop`: cualquier rama nueva sale de ahí. A `main`
+no se commitea directo; solo recibe lo que viene de `develop`.
+
+- Cada ejercicio tiene su rama `ejercicio/NN-nombre` (por ejemplo
+  `ejercicio/11-pytest-fastapi`), creada desde `develop`. Ahí van los commits
+  chicos e intermedios.
+- Al terminar el ejercicio se mergea a `develop` con `--no-ff`. Ese merge
+  commit agrupa el aprendizaje: el mensaje lleva la pregunta de partida y un
+  resumen de qué me llevé.
+- `develop` se mergea a `main` también con `--no-ff`.
+- Nunca squash ni rebase de ramas ya mergeadas: `main` y `develop` tienen que
+  compartir historia.
+- Para ver un aprendizaje por línea: `git log --first-parent --oneline develop`.
+
 ## Skills y plugins
 
 Si hace falta instalar skills, plugins o cualquier configuración de Claude Code,
